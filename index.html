@@ -1,14 +1,16 @@
 <div id="graph">
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <canvas id="myChart" width="600" height="600"></canvas>
 </div>
 
 <div id="controls">
     <p id="demand_shift"></p>
-    <input id="demand_slider" type="range" min="-50" max="50" value="0">
+    <input id="demand_slider" type="range" min="-20" max="20" value="0">
     <br>
     <p id="supply_shift"></p>
-    <input id="supply_slider" type="range" min="-50" max="50" value="0">
+    <input id="supply_slider" type="range" min="-20" max="20" value="0">
 </div>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script>
@@ -48,6 +50,8 @@
             }]
         },
         options: {
+            responsive: false,
+            maintainAspectRatio: false,
             scales: {
                 xAxes: [{
                     type: 'linear',
@@ -66,14 +70,6 @@
                     }
                 }]
             },
-            layout: {
-                padding: {
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    bottom: 0
-                }
-            },
             title: {
                 display: true,
                 text: 'Supply vs Demand',
@@ -81,6 +77,8 @@
             }
         }
     });
+
+    
 
     function generateSupplyPoints(shift) {
         var list = []
@@ -143,3 +141,4 @@
         updateSupplyData(this.value);
     }
 </script>
+
