@@ -1,0 +1,145 @@
+<div id="graph">
+    <canvas id="myChart" width="400" height="400"></canvas>
+</div>
+
+<div id="controls">
+    <p id="demand_shift"></p>
+    <input id="demand_slider" type="range" min="-50" max="50" value="0">
+    <br>
+    <p id="supply_shift"></p>
+    <input id="supply_slider" type="range" min="-50" max="50" value="0">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script>
+    var d_slider = document.getElementById("demand_slider");
+    var s_slider = document.getElementById("supply_slider");
+
+    var supply_text = document.getElementById("supply_shift");
+    var demand_text = document.getElementById("demand_shift");
+
+    var ctx = document.getElementById('myChart');
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            "datasets": [
+            {
+                "label": "Equilibrium Point",
+                "data": [{x:35, y:35}],
+                "fill": false,
+                "pointRadius": 5,
+                "borderColor":"rgb(0, 0, 0)",
+                "pointBackgroundColor": "rgb(0, 0, 0)"
+            },
+            {
+                "label": "Supply Curve",
+                "data": generateSupplyPoints(0),
+                "fill": false,
+                "borderColor":"rgb(255, 0, 0)",
+                "pointBackgroundColor": "rgb(255, 0, 0)"
+            },
+            {
+                "label": "Demand Curve",
+                "data": generateDemandPoints(0),
+                "fill": false,
+                "borderColor":"rgb(0, 0, 255)",
+                "pointBackgroundColor": "rgb(0, 0, 255)"
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'linear',
+                    position: 'bottom',
+                    ticks: {
+                        min: 0,
+                        max: 70
+                    }
+                }],
+                yAxes: [{
+                    type: 'linear',
+                    position: 'bottom',
+                    ticks: {
+                        min: 0,
+                        max: 70
+                    }
+                }]
+            },
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                }
+            },
+            title: {
+                display: true,
+                text: 'Supply vs Demand',
+                fontSize: 24
+            }
+        }
+    });
+
+    function generateSupplyPoints(shift) {
+        var list = []
+        for (let i = 0; i < 8; i++) {
+            list.push({x:(i*10.0)+parseInt(shift), y:i*10.0});
+        }
+        return list
+    }
+    function generateDemandPoints(shift) {
+        var list = []
+        for (let i = 0; i < 8; i++) {
+            list.push({x:(i*10.0)+parseInt(shift), y:70.0-i*10.0});
+        }
+        return list
+    }
+
+    var supply_shift = 0;
+    var demand_shift = 0;
+
+    function updateSupplyData(new_supply_shift) {
+        chart.data.datasets[1].data = generateSupplyPoints(new_supply_shift);
+        //console.log("Updating supply");
+        //console.log(chart.data.datasets[0].data);
+        updateEquilibriumData(new_supply_shift, demand_shift);
+        chart.update();
+    }
+
+    function updateDemandData(new_demand_shift) {
+        chart.data.datasets[2].data = generateDemandPoints(new_demand_shift);
+        //console.log("Updating demand");
+        updateEquilibriumData(supply_shift, new_demand_shift);
+        chart.update();
+    }
+
+    function updateEquilibriumData(new_supply_shift, new_demand_shift) {
+        new_supply_shift = parseInt(new_supply_shift);
+        new_demand_shift = parseInt(new_demand_shift);
+
+        x_e = (70+new_supply_shift+new_demand_shift)/2.0;
+        y_e = x_e-new_supply_shift;
+
+        console.log(x_e + ", " + y_e);
+        
+        chart.data.datasets[0].data = [{x:x_e, y:y_e}]
+    }
+
+    window.onload = function () {
+        supply_text.innerHTML = "Supply Shift: 0";
+        demand_text.innerHTML = "Demand Shift: 0";
+    }
+
+    d_slider.oninput = function () {
+        demand_text.innerHTML = "Demand Shift: " + this.value;
+        demand_shift = this.value;
+        updateDemandData(this.value);
+    }
+    s_slider.oninput = function () {
+        supply_text.innerHTML = "Supply Shift: " + this.value;
+        supply_shift = this.value;
+        updateSupplyData(this.value);
+    }
+</script>
