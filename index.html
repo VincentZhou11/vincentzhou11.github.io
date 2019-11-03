@@ -1,144 +1,358 @@
-<div id="graph">
-    <canvas id="myChart" width="600" height="600"></canvas>
-</div>
+<!DOCTYPE html>
+<html lang="en">
 
-<div id="controls">
-    <p id="demand_shift"></p>
-    <input id="demand_slider" type="range" min="-20" max="20" value="0">
-    <br>
-    <p id="supply_shift"></p>
-    <input id="supply_slider" type="range" min="-20" max="20" value="0">
-</div>
-
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-<script>
-    var d_slider = document.getElementById("demand_slider");
-    var s_slider = document.getElementById("supply_slider");
-
-    var supply_text = document.getElementById("supply_shift");
-    var demand_text = document.getElementById("demand_shift");
-
-    var ctx = document.getElementById('myChart');
-
-    var chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            "datasets": [
-            {
-                "label": "Equilibrium Point",
-                "data": [{x:35, y:35}],
-                "fill": false,
-                "pointRadius": 5,
-                "borderColor":"rgb(0, 0, 0)",
-                "pointBackgroundColor": "rgb(0, 0, 0)"
-            },
-            {
-                "label": "Supply Curve",
-                "data": generateSupplyPoints(0),
-                "fill": false,
-                "borderColor":"rgb(255, 0, 0)",
-                "pointBackgroundColor": "rgb(255, 0, 0)"
-            },
-            {
-                "label": "Demand Curve",
-                "data": generateDemandPoints(0),
-                "fill": false,
-                "borderColor":"rgb(0, 0, 255)",
-                "pointBackgroundColor": "rgb(0, 0, 255)"
-            }]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'linear',
-                    position: 'bottom',
-                    ticks: {
-                        min: 0,
-                        max: 70
-                    }
-                }],
-                yAxes: [{
-                    type: 'linear',
-                    position: 'bottom',
-                    ticks: {
-                        min: 0,
-                        max: 70
-                    }
-                }]
-            },
-            title: {
-                display: true,
-                text: 'Supply vs Demand',
-                fontSize: 24
-            }
-        }
-    });
-
+<head>
+    <link 
+        rel="stylesheet" 
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+        crossorigin="anonymous">
     
+</head>
 
-    function generateSupplyPoints(shift) {
-        var list = []
-        for (let i = 0; i < 8; i++) {
-            list.push({x:(i*10.0)+parseInt(shift), y:i*10.0});
+<body>
+    <h1 class="display-1 text-center">Interactive Econ Stuff</h1>
+    <h1 class="display-3 text-center">By Vincent Zhou</h1> 
+    <div class="graph">
+        <canvas id="supply_vs_demand_chart" width="600" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <p id="demand_shift">Demand Shift: 0</p>
+        <input class="slider" id="demand_slider" type="range" min="-20" max="20" value="0">
+        <br>
+        <p id="supply_shift">Supply Shift: 0</p>
+        <input class="slider" id="supply_slider" type="range" min="-20" max="20" value="0">
+    </div>
+
+    <div class="graph">
+        <canvas id="cost_chart" width="600" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <p id="tfc">TFC: 100</p>
+        <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
+        <br>
+        <p id="tvc_growth">TVC Growth: 1</p>
+        <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
+    </div>
+
+    <style>
+        canvas{
+            margin: 0 auto;
         }
-        return list
-    }
-    function generateDemandPoints(shift) {
-        var list = []
-        for (let i = 0; i < 8; i++) {
-            list.push({x:(i*10.0)+parseInt(shift), y:70.0-i*10.0});
+        .controls{
+            margin: auto;
+            width: 40%;
         }
-        return list
-    }
+        .slider{
+            width: 100%;
+        }
+    </style>
 
-    var supply_shift = 0;
-    var demand_shift = 0;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script>
+        var d_slider = document.getElementById("demand_slider");
+        var s_slider = document.getElementById("supply_slider");
 
-    function updateSupplyData(new_supply_shift) {
-        chart.data.datasets[1].data = generateSupplyPoints(new_supply_shift);
-        //console.log("Updating supply");
-        //console.log(chart.data.datasets[0].data);
-        updateEquilibriumData(new_supply_shift, demand_shift);
-        chart.update();
-    }
+        var supply_text = document.getElementById("supply_shift");
+        var demand_text = document.getElementById("demand_shift");
 
-    function updateDemandData(new_demand_shift) {
-        chart.data.datasets[2].data = generateDemandPoints(new_demand_shift);
-        //console.log("Updating demand");
-        updateEquilibriumData(supply_shift, new_demand_shift);
-        chart.update();
-    }
+        var ctx = document.getElementById('supply_vs_demand_chart');
 
-    function updateEquilibriumData(new_supply_shift, new_demand_shift) {
-        new_supply_shift = parseInt(new_supply_shift);
-        new_demand_shift = parseInt(new_demand_shift);
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                "datasets": [
+                    {
+                        "label": "Equilibrium Point",
+                        "data": [{ x: 35, y: 35 }],
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 0)",
+                        "pointBackgroundColor": "rgb(0, 0, 0)"
+                    },
+                    {
+                        "label": "Supply Curve",
+                        "data": generateSupplyPoints(0),
+                        "fill": false,
+                        "borderColor": "rgb(255, 0, 0)",
+                        "pointBackgroundColor": "rgb(255, 0, 0)"
+                    },
+                    {
+                        "label": "Demand Curve",
+                        "data": generateDemandPoints(0),
+                        "fill": false,
+                        "borderColor": "rgb(0, 0, 255)",
+                        "pointBackgroundColor": "rgb(0, 0, 255)"
+                    }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 70
+                        }
+                    }],
+                    yAxes: [{
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 70
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Supply vs Demand',
+                    fontSize: 24
+                }
+            }
+        });
 
-        x_e = (70+new_supply_shift+new_demand_shift)/2.0;
-        y_e = x_e-new_supply_shift;
 
-        console.log(x_e + ", " + y_e);
-        
-        chart.data.datasets[0].data = [{x:x_e, y:y_e}]
-    }
 
-    window.onload = function () {
-        supply_text.innerHTML = "Supply Shift: 0";
-        demand_text.innerHTML = "Demand Shift: 0";
-    }
+        function generateSupplyPoints(shift) {
+            var list = []
+            for (let i = 0; i < 8; i++) {
+                list.push({ x: (i * 10.0) + parseInt(shift), y: i * 10.0 });
+            }
+            return list
+        }
+        function generateDemandPoints(shift) {
+            var list = []
+            for (let i = 0; i < 8; i++) {
+                list.push({ x: (i * 10.0) + parseInt(shift), y: 70.0 - i * 10.0 });
+            }
+            return list
+        }
 
-    d_slider.oninput = function () {
-        demand_text.innerHTML = "Demand Shift: " + this.value;
-        demand_shift = this.value;
-        updateDemandData(this.value);
-    }
-    s_slider.oninput = function () {
-        supply_text.innerHTML = "Supply Shift: " + this.value;
-        supply_shift = this.value;
-        updateSupplyData(this.value);
-    }
-</script>
+        var supply_shift = 0;
+        var demand_shift = 0;
 
+        function updateSupplyData(new_supply_shift) {
+            chart.data.datasets[1].data = generateSupplyPoints(new_supply_shift);
+            //console.log("Updating supply");
+            //console.log(chart.data.datasets[0].data);
+            updateEquilibriumData(new_supply_shift, demand_shift);
+            chart.update();
+        }
+
+        function updateDemandData(new_demand_shift) {
+            chart.data.datasets[2].data = generateDemandPoints(new_demand_shift);
+            //console.log("Updating demand");
+            updateEquilibriumData(supply_shift, new_demand_shift);
+            chart.update();
+        }
+
+        function updateEquilibriumData(new_supply_shift, new_demand_shift) {
+            new_supply_shift = parseInt(new_supply_shift);
+            new_demand_shift = parseInt(new_demand_shift);
+
+            x_e = (70 + new_supply_shift + new_demand_shift) / 2.0;
+            y_e = x_e - new_supply_shift;
+
+            console.log(x_e + ", " + y_e);
+
+            chart.data.datasets[0].data = [{ x: x_e, y: y_e }]
+        }
+
+        d_slider.oninput = function () {
+            demand_text.innerHTML = "Demand Shift: " + this.value;
+            demand_shift = this.value;
+            updateDemandData(this.value);
+        }
+        s_slider.oninput = function () {
+            supply_text.innerHTML = "Supply Shift: " + this.value;
+            supply_shift = this.value;
+            updateSupplyData(this.value);
+        }
+    </script>
+    <script>
+        var tfc_slider = document.getElementById('tfc_slider');
+        var tfc_text = document.getElementById('tfc');
+        var tfc = 100;
+        var tvc_growth_slider = document.getElementById('tvc_growth_slider');
+        var tvc_growth_text = document.getElementById('tvc_growth');
+        var tvc_growth = 1;
+        var cost_ctx = document.getElementById('cost_chart');
+
+        let q_max = 40;
+
+        var cost_chart = new Chart(cost_ctx, {
+            type: 'line',
+            data: {
+                "datasets": [
+                    {
+                        "label": "MC",
+                        "data": generateMCPoints(1),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 0)",
+                        "pointBackgroundColor": "rgb(0, 0, 0)"
+                    },
+                    {
+                        "label": "ATC",
+                        "data": generateATCPoints(100, 1),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(255, 0, 0)",
+                        "pointBackgroundColor": "rgb(255, 0, 0)"
+                    },
+                    {
+                        "label": "AVC",
+                        "data": generateAVCPoints(1),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 255, 0)",
+                        "pointBackgroundColor": "rgb(0, 255, 0)"
+                    },
+                    {
+                        "label": "AFC",
+                        "data": generateAFCPoints(100),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(255, 255, 0)",
+                        "pointBackgroundColor": "rgb(255, 255, 0)"
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 40
+                        }
+                    }],
+                    yAxes: [{
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 100
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Cost Graph',
+                    fontSize: 24
+                }
+            }
+        });
+
+        function getAvg(arr) {
+            return getSum(arr) / arr.length;
+        }
+
+        function getSum(arr) {
+            var sum = 0.0;
+            for (let i = 0; i < arr.length; i++) {
+                sum += arr[i].y
+            }
+            return sum;
+        }
+
+        function generateAveragePoints(costs) {
+            var list = [];
+            for (let i = 0; i < costs.length; i++) {
+                list.push({ x: i + 1, y: costs[i].y / (i + 1) });
+            }
+            return list;
+        }
+
+        function generateTVCPoints(costs) {
+            var list = [];
+            for (let i = 0; i < costs.length; i++) {
+                var curr_list = costs.slice(0, i + 1);
+                list.push({ x: i + 1, y: getSum(curr_list) });
+            }
+            return list;
+        }
+
+        function generateAVCPoints(growth) {
+            return generateAveragePoints(generateTVCPoints(generateMCPoints(growth), 0));
+        }
+
+        function generateTCPoints(costs, fixed_cost) {
+            var list = [];
+            for (let i = 0; i < costs.length; i++) {
+                var curr_list = costs.slice(0, i + 1);
+                list.push({ x: i + 1, y: getSum(curr_list) + fixed_cost });
+            }
+            return list;
+        }
+
+        function generateATCPoints(fixed_cost, growth) {
+            return generateAveragePoints(generateTCPoints(generateMCPoints(growth), fixed_cost));
+        }
+
+        function generateAFCPoints(fixed_cost) {
+            var list = [];
+            for (let i = 0; i < q_max; i++) {
+                list.push({ x: i + 1, y: fixed_cost / (i + 1) });
+            }
+            return list;
+        }
+
+        function generateMCPoints(growth) {
+            var list = [];
+            var momentum = -10;
+            list.push({ x: 1, y: 60 })
+            for (let i = 0; i < q_max; i++) {
+                prev_point = list[i];
+                list.push({ x: prev_point.x + 1, y: prev_point.y + (momentum + (i + 1) * growth) });
+            }
+            return list;
+        }
+
+        function update_tfc(fixed_cost) {
+            cost_chart.data.datasets[1].data = generateATCPoints(fixed_cost, tvc_growth);
+            cost_chart.data.datasets[3].data = generateAFCPoints(fixed_cost);
+            cost_chart.update();
+        }
+
+        function update_tvc_growth(growth) {
+            cost_chart.data.datasets[0].data = generateMCPoints(growth);
+            cost_chart.data.datasets[1].data = generateATCPoints(tfc, growth);
+            cost_chart.data.datasets[2].data = generateAVCPoints(growth);
+            cost_chart.update();
+        }
+
+        tfc_slider.oninput = function () {
+            tfc_text.innerHTML = "TFC: " + this.value;
+            tfc = parseInt(this.value);
+            update_tfc(tfc);
+        }
+        tvc_growth_slider.oninput = function () {
+            tvc_growth_text.innerHTML = "TVC Growth: " + this.value;
+            tvc_growth = parseInt(this.value);
+            update_tvc_growth(tvc_growth);
+        }
+    </script>
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+    <script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
+        crossorigin="anonymous"></script>
+    <script 
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
