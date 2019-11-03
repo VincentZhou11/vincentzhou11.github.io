@@ -13,28 +13,57 @@
 <body>
     <h1 class="display-1 text-center">Interactive Econ Stuff</h1>
     <h1 class="display-3 text-center">By Vincent Zhou</h1> 
+    <br>
+    <h1 class="display-4 text-center">Supply vs Demand</h1>
     <div class="graph">
-        <canvas id="supply_vs_demand_chart" width="600" height="600"></canvas>
+        <canvas id="supply_vs_demand_chart" width="1000" height="600"></canvas>
     </div>
-
+    
+    <!--     
     <div class="controls">
         <p id="demand_shift">Demand Shift: 0</p>
         <input class="slider" id="demand_slider" type="range" min="-20" max="20" value="0">
         <br>
         <p id="supply_shift">Supply Shift: 0</p>
         <input class="slider" id="supply_slider" type="range" min="-20" max="20" value="0">
+    </div> 
+    -->
+
+    <div class="card controls">
+        <h5 class="card-header">Controls</h5>
+        <div class="card-body">
+            <p id="demand_shift">Demand Shift: 0</p>
+            <input class="slider" id="demand_slider" type="range" min="-20" max="20" value="0">
+            <br>
+            <p id="supply_shift">Supply Shift: 0</p>
+            <input class="slider" id="supply_slider" type="range" min="-20" max="20" value="0">
+        </div>
     </div>
+
+    <br>
+    <h1 class="display-4 text-center">Cost Curve</h1>
 
     <div class="graph">
-        <canvas id="cost_chart" width="600" height="600"></canvas>
+        <canvas id="cost_chart" width="1000" height="600"></canvas>
     </div>
-
+    <!-- 
     <div class="controls">
         <p id="tfc">TFC: 100</p>
         <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
         <br>
         <p id="tvc_growth">TVC Growth: 1</p>
         <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
+    </div>
+    -->
+    <div class="card controls">
+        <h5 class="card-header">Controls</h5>
+        <div class="card-body">
+            <p id="tfc">TFC: 100</p>
+            <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
+            <br>
+            <p id="tvc_growth">TVC Growth: 1</p>
+            <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
+        </div>
     </div>
 
     <style>
@@ -43,7 +72,7 @@
         }
         .controls{
             margin: auto;
-            width: 40%;
+            width: 70%;
         }
         .slider{
             width: 100%;
@@ -107,11 +136,6 @@
                             max: 70
                         }
                     }]
-                },
-                title: {
-                    display: true,
-                    text: 'Supply vs Demand',
-                    fontSize: 24
                 }
             }
         });
@@ -243,11 +267,6 @@
                             max: 100
                         }
                     }]
-                },
-                title: {
-                    display: true,
-                    text: 'Cost Graph',
-                    fontSize: 24
                 }
             }
         });
