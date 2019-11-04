@@ -2,18 +2,21 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <link 
         rel="stylesheet" 
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
         crossorigin="anonymous">
-    
+        <title>📈</title>
 </head>
 
 <body>
-    <h1 class="display-1 text-center">Interactive Econ Stuff</h1>
+    <h1 class="display-1 text-center">Interactive Econ Stuff 📈</h1>
     <h1 class="display-3 text-center">By Vincent Zhou</h1> 
-    <br>
+
+    <hr class="my-4" style="width: 75%">
+
     <h1 class="display-4 text-center">Supply vs Demand</h1>
     <div class="graph">
         <canvas id="supply_vs_demand_chart" width="1000" height="600"></canvas>
@@ -40,7 +43,7 @@
         </div>
     </div>
 
-    <br>
+    <hr class="my-4" style="width: 75%">
     <h1 class="display-4 text-center">Cost Curve</h1>
 
     <div class="graph">
@@ -62,7 +65,7 @@
             <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
             <br>
             <p id="tvc_growth">TVC Growth: 1</p>
-            <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
+            <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1" step=".1">
         </div>
     </div>
 
@@ -121,19 +124,32 @@
                 maintainAspectRatio: false,
                 scales: {
                     xAxes: [{
+                        display: true,
                         type: 'linear',
                         position: 'bottom',
                         ticks: {
                             min: 0,
                             max: 70
+                        },
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Quantity'
                         }
                     }],
                     yAxes: [{
+                        display: true,
                         type: 'linear',
                         position: 'bottom',
                         ticks: {
                             min: 0,
-                            max: 70
+                            max: 70,
+                            callback: function(value, index, values) {
+                                return '$' + value;
+                            }
+                        },
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Price'
                         }
                     }]
                 }
@@ -242,8 +258,8 @@
                         "data": generateAFCPoints(100),
                         "fill": false,
                         "pointRadius": 5,
-                        "borderColor": "rgb(255, 255, 0)",
-                        "pointBackgroundColor": "rgb(255, 255, 0)"
+                        "borderColor": "rgb(255, 0, 255)",
+                        "pointBackgroundColor": "rgb(255, 0, 255)"
                     }
                 ]
             },
@@ -256,7 +272,11 @@
                         position: 'bottom',
                         ticks: {
                             min: 0,
-                            max: 40
+                            max: 40,
+                        },
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Q'
                         }
                     }],
                     yAxes: [{
@@ -264,7 +284,14 @@
                         position: 'bottom',
                         ticks: {
                             min: 0,
-                            max: 100
+                            max: 100,
+                            callback: function(value, index, values) {
+                                return '$' + value;
+                            } 
+                        },
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Cost'
                         }
                     }]
                 }
@@ -356,7 +383,7 @@
         }
         tvc_growth_slider.oninput = function () {
             tvc_growth_text.innerHTML = "TVC Growth: " + this.value;
-            tvc_growth = parseInt(this.value);
+            tvc_growth = parseFloat(this.value);
             update_tvc_growth(tvc_growth);
         }
     </script>
