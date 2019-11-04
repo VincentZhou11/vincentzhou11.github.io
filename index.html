@@ -17,7 +17,19 @@
 
     <hr class="my-4" style="width: 75%">
 
-    <h1 class="display-4 text-center">Supply vs Demand</h1>
+    <div class="jumbotron" style="width: 75%; margin:auto;">
+        <h1 class="display-4">Table of Contents</h1>
+        <p class="lead">A bunch of economics graphs with interactive sliders that show animations</p>
+        <hr class="my-4">
+        <div class="list-group">
+            <a href="#supply_vs_demand_place" class="list-group-item list-group-item-action">Supply vs Demand Graph</a>
+            <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve</a>
+        </div>
+    </div>
+          
+    <hr class="my-4" style="width: 75%">
+
+    <h1 class="display-4 text-center" id="supply_vs_demand_place">Supply vs Demand</h1>
     <div class="graph">
         <canvas id="supply_vs_demand_chart" width="1000" height="600"></canvas>
     </div>
@@ -44,7 +56,7 @@
     </div>
 
     <hr class="my-4" style="width: 75%">
-    <h1 class="display-4 text-center">Cost Curve</h1>
+    <h1 class="display-4 text-center" id="cost_curve_place">Cost Curve</h1>
 
     <div class="graph">
         <canvas id="cost_chart" width="1000" height="600"></canvas>
