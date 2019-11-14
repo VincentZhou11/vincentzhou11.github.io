@@ -3,17 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <link 
-        rel="stylesheet" 
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
-        crossorigin="anonymous">
-        <title>📈</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>📈</title>
 </head>
 
 <body>
     <h1 class="display-1 text-center">Interactive Econ Stuff 📈</h1>
-    <h1 class="display-3 text-center">By Vincent Zhou</h1> 
+    <h1 class="display-3 text-center">By Vincent Zhou</h1>
 
     <hr class="my-4" style="width: 75%">
 
@@ -23,17 +20,17 @@
         <hr class="my-4">
         <div class="list-group">
             <a href="#supply_vs_demand_place" class="list-group-item list-group-item-action">Supply vs Demand Graph</a>
-            <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve</a>
+            <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve <span class="badge badge-secondary">New</span></a>
         </div>
     </div>
-          
+
     <hr class="my-4" style="width: 75%">
 
     <h1 class="display-4 text-center" id="supply_vs_demand_place">Supply vs Demand</h1>
     <div class="graph">
         <canvas id="supply_vs_demand_chart" width="1000" height="600"></canvas>
     </div>
-    
+
     <!--     
     <div class="controls">
         <p id="demand_shift">Demand Shift: 0</p>
@@ -56,10 +53,21 @@
     </div>
 
     <hr class="my-4" style="width: 75%">
-    <h1 class="display-4 text-center" id="cost_curve_place">Cost Curve</h1>
+    <h1 class="display-4 text-center" id="cost_curve_place">Cost Curve <span class="badge badge-secondary">New</span></h1>
 
-    <div class="graph">
-        <canvas id="cost_chart" width="1000" height="600"></canvas>
+    <div class="graph center">
+        <div class="card border-info mb-3 center-element" id ="cc_info_panel" style="width: 18rem; display: none; vertical-align: top;">
+            <div class="card-header">Info</div>
+            <div class="card-body text-info">
+                <h5 class="card-title">Total Profit</h5>
+                <p class="card-text" id="cc_total_profit">$0</p>
+                <h5 class="card-title">Optimal Output</h5>
+                <p class="card-text" id="cc_q">None</p>
+                <h5 class="card-title">Shutdown</h5>
+                <p class="card-text" id="cc_shutdown">True</p>
+            </div>
+        </div>
+        <canvas class="center-element" id="cost_chart" width="1000" height="600" style="display: inline-block"></canvas>
     </div>
     <!-- 
     <div class="controls">
@@ -70,6 +78,8 @@
         <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
     </div>
     -->
+
+    <!-- 
     <div class="card controls">
         <h5 class="card-header">Controls</h5>
         <div class="card-body">
@@ -80,18 +90,63 @@
             <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1" step=".1">
         </div>
     </div>
+    -->
+
+    <div class="card text-center controls">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="cc_normal_tab" data-toggle="tab" href="#cc_normal_panel" role="tab">Cost Controls</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="cc_mrdarp_tab" data-toggle="tab" href="#cc_mrdarp_panel" role="tab">MR.DARP Controls</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="cc_normal_panel" role="tabpanel">
+                    <p id="tfc">TFC: 100</p>
+                    <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
+                    <br>
+                    <p id="tvc_growth">TVC Growth: 1</p>
+                    <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1" step=".1">
+                </div>
+                <div class="tab-pane fade" id="cc_mrdarp_panel" role="tabpanel">
+                    <p>Enable MR.DARP</p>
+                    <input id="price_checkbox" type="checkbox">
+                    <br>
+                    <p id="price">Price: 10</p>
+                    <input class="slider" id="price_slider" type="range" min="10" max="100" value="10">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <style>
-        canvas{
+        canvas {
             margin: 0 auto;
         }
-        .controls{
+
+        .controls {
             margin: auto;
             width: 70%;
         }
-        .slider{
+
+        .slider {
             width: 100%;
         }
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+        .center-element {
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+        
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
@@ -143,7 +198,7 @@
                             min: 0,
                             max: 70
                         },
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Quantity'
                         }
@@ -155,11 +210,11 @@
                         ticks: {
                             min: 0,
                             max: 70,
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return '$' + value;
                             }
                         },
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Price'
                         }
@@ -230,9 +285,22 @@
         var tfc_slider = document.getElementById('tfc_slider');
         var tfc_text = document.getElementById('tfc');
         var tfc = 100;
+
         var tvc_growth_slider = document.getElementById('tvc_growth_slider');
         var tvc_growth_text = document.getElementById('tvc_growth');
         var tvc_growth = 1;
+
+        var price = 10;
+        var price_checkbox = document.getElementById('price_checkbox');
+        var price_slider = document.getElementById('price_slider');
+        var price_text = document.getElementById('price');
+
+        var cost_info_panel = document.getElementById('cc_info_panel');
+        var mrdarp_enabled = false;
+        var tp_text = document.getElementById('cc_total_profit');
+        var q_text = document.getElementById('cc_q');
+        var shutdown_text = document.getElementById('cc_shutdown');
+
         var cost_ctx = document.getElementById('cost_chart');
 
         let q_max = 40;
@@ -286,7 +354,7 @@
                             min: 0,
                             max: 40,
                         },
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Q'
                         }
@@ -297,11 +365,11 @@
                         ticks: {
                             min: 0,
                             max: 100,
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return '$' + value;
-                            } 
+                            }
                         },
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Cost'
                         }
@@ -364,6 +432,11 @@
             return list;
         }
 
+        function generateMrdarpPoints(price) {
+            var list = [{x: 0, y:price}, {x:40, y:price}]
+            return list;
+        }
+
         function generateMCPoints(growth) {
             var list = [];
             var momentum = -10;
@@ -373,6 +446,31 @@
                 list.push({ x: prev_point.x + 1, y: prev_point.y + (momentum + (i + 1) * growth) });
             }
             return list;
+        }
+
+        function get_min_point(points) {
+            min_y_value = points[0].y;
+            min_x_index = 0;
+            for (var i = 1; i < points.length; i++) {
+                if (points[i].y < min_y_value) {
+                    min_y_value = points[i].y;
+                    min_x_index = i;
+                }
+            }
+            return {x_min: min_x_index, y_min:min_y_value};
+        }
+
+        function get_nearest_point(points, target) {
+            min_point = get_min_point(points);
+            near_y_val = min_point.y_min;
+            near_x_index = min_point.x_min;
+            for (var i = min_point.x_min+1; i < points.length; i++) {
+                if (Math.abs(target - points[i].y) < Math.abs(target - near_y_val)) {
+                    near_y_val = points[i].y;
+                    near_x_index = i;
+                }
+            }
+            return {x_near: near_x_index, y_near:near_y_val};
         }
 
         function update_tfc(fixed_cost) {
@@ -388,6 +486,50 @@
             cost_chart.update();
         }
 
+        function update_mrdarp(enabled, price) {
+            if (enabled) {
+                if (cost_chart.data.datasets.length > 4)
+                {
+                    cost_chart.data.datasets[4].data = generateMrdarpPoints(price);
+                }
+                else {
+                    mrdarp_dataset = {
+                        "label": "Price",
+                        "data": generateMrdarpPoints(price),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 255)",
+                        "pointBackgroundColor": "rgb(0, 0, 255)"
+                    }
+                    cost_chart.data.datasets.push(mrdarp_dataset);
+                }    
+                cost_chart.update();
+                var min_ATC = get_min_point(cost_chart.data.datasets[1].data);
+                var min_AVC = get_min_point(cost_chart.data.datasets[2].data);
+                var near_MC = get_nearest_point(cost_chart.data.datasets[0].data, price);
+
+                if (price < min_AVC.y_min)
+                {
+                    shutdown_text.innerHTML = "Yes";
+                    q_text.innerHTML = "0";
+                    tp_text.innerHTML = "$-" + tfc;
+                }
+                else {
+                    var q_ATC = cost_chart.data.datasets[1].data[near_MC.x_near].y
+
+                    shutdown_text.innerHTML = "No";
+                    q_text.innerHTML = near_MC.x_near+1;
+                    tp_text.innerHTML =  "$" + ((near_MC.x_near+1)*price-(near_MC.x_near+1)*q_ATC);
+                }
+                 
+            }
+            else {
+                if (cost_chart.data.datasets.length > 4) {
+                    cost_chart.data.datasets.pop();
+                }
+            }
+        }
+
         tfc_slider.oninput = function () {
             tfc_text.innerHTML = "TFC: " + this.value;
             tfc = parseInt(this.value);
@@ -398,18 +540,30 @@
             tvc_growth = parseFloat(this.value);
             update_tvc_growth(tvc_growth);
         }
+        price_slider.oninput = function () {
+            price_text.innerHTML = "Price: " + this.value;
+            price = parseInt(this.value);
+            update_mrdarp(mrdarp_enabled, price);
+        }
+        price_checkbox.oninput = function () {
+            if (this.checked) {
+                cost_info_panel.style.display = "inline-block";
+                mrdarp_enabled = true;
+                update_mrdarp(mrdarp_enabled, price);
+            }
+            else {
+                cost_info_panel.style.display = "none";
+                mrdarp_enabled = false;
+            }
+        }
     </script>
-    <script
-        src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
-    <script 
-        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
-        crossorigin="anonymous"></script>
-    <script 
-        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 </body>
 
