@@ -534,11 +534,13 @@
             tfc_text.innerHTML = "TFC: " + this.value;
             tfc = parseInt(this.value);
             update_tfc(tfc);
+            update_mrdarp(mrdarp_enabled, price);
         }
         tvc_growth_slider.oninput = function () {
             tvc_growth_text.innerHTML = "TVC Growth: " + this.value;
             tvc_growth = parseFloat(this.value);
             update_tvc_growth(tvc_growth);
+            update_mrdarp(mrdarp_enabled, price);
         }
         price_slider.oninput = function () {
             price_text.innerHTML = "Price: " + this.value;
