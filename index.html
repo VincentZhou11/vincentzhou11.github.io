@@ -20,7 +20,8 @@
         <hr class="my-4">
         <div class="list-group">
             <a href="#supply_vs_demand_place" class="list-group-item list-group-item-action">Supply vs Demand Graph</a>
-            <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve <span class="badge badge-secondary">New</span></a>
+            <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve</a>
+            <a href="#monopoly_place" class="list-group-item list-group-item-action">Monopoly Cost Curve</a>
         </div>
     </div>
 
@@ -122,6 +123,37 @@
             </div>
         </div>
     </div>
+
+    <hr class="my-4" style="width: 75%">
+    <h1 class="display-4 text-center" id="monopoly_place">Monopoly Cost Curve</h1>
+
+    <div class="graph center">
+        <div class="card border-info mb-3 center-element" id ="cc_info_panel" style="width: 18rem; display: inline-block; vertical-align: top;">
+            <div class="card-header">Info</div>
+            <div class="card-body text-info">
+                <h5 class="card-title">Optimal Output</h5>
+                <p class="card-text" id="monopoly_optimal_output">17</p>
+                <h5 class="card-title">Optimal Price</h5>
+                <p class="card-text" id="monopoly_optimal_price">$40.25</p>
+                <h5 class="card-title">Profit</h5>
+                <p class="card-text" id="monopoly_profit">$108.25</p>
+            </div>
+        </div>
+        <canvas class="center-element" id="monopoly_chart" width="1000" height="600" style="display: inline-block"></canvas>
+    </div>
+
+    <div class="card controls">
+        <h5 class="card-header">Controls</h5>
+        <div class="card-body">
+            <p id="monopoly_tfc">TFC Shift: 100</p>
+            <input class="slider" id="monopoly_tfc_slider" type="range" min="20" max="100" value="100">
+            <br>
+            <p id="monopoly_tvc">TVC Growth : 1</p>
+            <input class="slider" id="monopoly_tvc_slider" type="range" min="1" max="5" value="1" step=".1">
+        </div>
+    </div>
+
+    
 
     <style>
         canvas {
@@ -226,14 +258,14 @@
 
 
         function generateSupplyPoints(shift) {
-            var list = []
+            var list = [];
             for (let i = 0; i < 8; i++) {
                 list.push({ x: (i * 10.0) + parseInt(shift), y: i * 10.0 });
             }
             return list
         }
         function generateDemandPoints(shift) {
-            var list = []
+            var list = [];
             for (let i = 0; i < 8; i++) {
                 list.push({ x: (i * 10.0) + parseInt(shift), y: 70.0 - i * 10.0 });
             }
@@ -560,6 +592,184 @@
                 update_mrdarp(mrdarp_enabled, price);
             }
         }
+    </script>
+        
+    <script>
+        var monopoly_tfc_slider = document.getElementById('monopoly_tfc_slider');
+        var monopoly_tfc = 100;
+        var monopoly_tfc_text = document.getElementById('monopoly_tfc');
+        var monopoly_tvc_slider = document.getElementById('monopoly_tvc_slider');
+        var monopoly_tvc = 1.0;
+        var monopoly_tvc_text = document.getElementById('monopoly_tvc');
+
+        var monopoly_optimal_output = document.getElementById('monopoly_optimal_output');
+        var monopoly_optimal_price = document.getElementById('monopoly_optimal_price');
+        var monopoly_profit = document.getElementById('monopoly_profit');
+
+        var monopoly_ctx = document.getElementById('monopoly_chart');
+
+        var monopoly_chart = new Chart(monopoly_ctx, {
+            type: 'line',
+            data: {
+                "datasets": [
+                    {
+                        "label": "MC",
+                        "data": generateMCPoints(1),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(255, 0, 0)",
+                        "pointBackgroundColor": "rgb(255, 0, 0)"
+                    },
+                    {
+                        "label": "ATC",
+                        "data": generateATCPoints(100, 1),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 255, 0)",
+                        "pointBackgroundColor": "rgb(0, 255, 0)"
+                    },
+                    {
+                        "label": "Demand Curve",
+                        "data": generate_xy_line(40.0, 70.0, 0, 40),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 255)",
+                        "pointBackgroundColor": "rgb(0, 0, 255)"
+                    },
+                    {
+                        "label": "MR Curve",
+                        "data": generate_xy_line(35.0, 70.0, 0, 40),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 0)",
+                        "pointBackgroundColor": "rgb(0, 0, 0)"
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 40
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Quantity'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 70,
+                            callback: function (value, index, values) {
+                                return '$' + value;
+                            }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Price'
+                        }
+                    }]
+                }
+            }
+        });
+
+        function generate_xy_line(x_value, y_value, x_min, x_max) {
+            var slope = y_value/x_value;
+            var list = [];
+            for (let i = x_min; i < x_max+1; i++) {
+                list.push({ x: i, y: y_value - i * slope});
+            }
+            return list;
+        }
+
+        function points_to_dict(points) {
+            var dict = Object();
+            for (let i = 0; i<points.length; i++) {
+                var point = points[i];
+                dict[point.x] = point.y;
+            }
+            return dict;
+        }
+
+        function get_nearest_points_two_lines(points1, points2, length) {
+            var min = -1;
+            var min_x_value = 0;
+
+            points1_dict = points_to_dict(points1);
+            points2_dict = points_to_dict(points2);
+            for (let i = 0; i < length; i++) {
+                var point1_y = points1_dict[i];
+                var point2_y = points2_dict[i];
+
+                var diff = Math.abs(point1_y-point2_y);
+
+                if (!isNaN(diff)) {
+                    //console.log(diff + " " + min);
+                    if (min == -1 || diff < min) {
+                        min_x_value = i;
+                        min = diff;
+                    }
+                }
+            }
+            return min_x_value;
+        }
+
+        function get_y_at_x(points, x) {
+            for (let i = 0; i < points.length; i++) {
+                var point = points[i];
+                if (point.x == x){
+                    return point.y;
+                }
+            }
+            console.log("Failed to get y value at " + x);
+            return Nan;
+        }
+
+        function monopoly_update(tfc, tvc) {
+            monopoly_chart.data.datasets[0].data = generateMCPoints(tvc);
+            monopoly_chart.data.datasets[1].data = generateATCPoints(tfc, tvc);
+            
+            //var min_ATC = get_min_point(monopoly_chart.data.datasets[1].data);
+            var optimal_output = get_nearest_points_two_lines(monopoly_chart.data.datasets[0].data, monopoly_chart.data.datasets[3].data, 40);
+            
+            monopoly_optimal_output.innerHTML = optimal_output;
+
+            var optimal_price = get_y_at_x(monopoly_chart.data.datasets[2].data, optimal_output);
+            var optimal_tr = optimal_output*optimal_price;
+
+            monopoly_optimal_price.innerHTML = "$" + optimal_price;
+
+            var optimal_atc = get_y_at_x(monopoly_chart.data.datasets[1].data, optimal_output);
+            var optimal_tc = optimal_output*optimal_atc;
+            
+            monopoly_profit.innerHTML = "$" + (optimal_tr-optimal_tc).toFixed(2);
+
+            //console.log(optimal_output);
+            monopoly_chart.update();
+        }
+
+        monopoly_tfc_slider.oninput = function () {
+            monopoly_tfc = parseInt(this.value);
+            monopoly_tfc_text.innerHTML = "TFC Shift: " + this.value;
+            monopoly_update(monopoly_tfc, monopoly_tvc);
+        }
+
+        monopoly_tvc_slider.oninput = function () {
+            monopoly_tvc = parseFloat(this.value);
+            monopoly_tvc_text.innerHTML = "TVC Growth: " + this.value;
+            monopoly_update(monopoly_tfc, monopoly_tvc);
+        }
+
     </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
