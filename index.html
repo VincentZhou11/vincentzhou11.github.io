@@ -22,6 +22,7 @@
             <a href="#supply_vs_demand_place" class="list-group-item list-group-item-action">Supply vs Demand Graph</a>
             <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve</a>
             <a href="#monopoly_place" class="list-group-item list-group-item-action">Monopoly Cost Curve</a>
+            <a href="#externalities_place" class="list-group-item list-group-item-action">Externalities Graph</a>
         </div>
     </div>
 
@@ -70,28 +71,6 @@
         </div>
         <canvas class="center-element" id="cost_chart" width="1000" height="600" style="display: inline-block"></canvas>
     </div>
-    <!-- 
-    <div class="controls">
-        <p id="tfc">TFC: 100</p>
-        <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
-        <br>
-        <p id="tvc_growth">TVC Growth: 1</p>
-        <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1">
-    </div>
-    -->
-
-    <!-- 
-    <div class="card controls">
-        <h5 class="card-header">Controls</h5>
-        <div class="card-body">
-            <p id="tfc">TFC: 100</p>
-            <input class="slider" id="tfc_slider" type="range" min="20" max="100" value="100">
-            <br>
-            <p id="tvc_growth">TVC Growth: 1</p>
-            <input class="slider" id="tvc_growth_slider" type="range" min="1" max="5" value="1" step=".1">
-        </div>
-    </div>
-    -->
 
     <div class="card text-center controls">
         <div class="card-header">
@@ -150,6 +129,22 @@
             <br>
             <p id="monopoly_tvc">TVC Growth : 1</p>
             <input class="slider" id="monopoly_tvc_slider" type="range" min="1" max="5" value="1" step=".1">
+        </div>
+    </div>
+
+    <hr class="my-4" style="width: 75%">
+    <h1 class="display-4 text-center" id="externalities_place">Externalities Graph</h1>
+    <div class="graph">
+        <canvas id="externalities_chart" width="1000" height="600"></canvas>
+    </div>
+    <div class="card controls">
+        <h5 class="card-header">Controls</h5>
+        <div class="card-body">
+            <p id="mec">MEC: 0</p>
+            <input class="slider" id="mec_slider" type="range" min="0" max="20" value="0">
+            <br>
+            <p id="meb">MEB: 0</p>
+            <input class="slider" id="meb_slider" type="range" min="0" max="20" value="0">
         </div>
     </div>
 
@@ -297,7 +292,7 @@
             x_e = (70 + new_supply_shift + new_demand_shift) / 2.0;
             y_e = x_e - new_supply_shift;
 
-            console.log(x_e + ", " + y_e);
+            //console.log(x_e + ", " + y_e);
 
             chart.data.datasets[0].data = [{ x: x_e, y: y_e }]
         }
@@ -771,6 +766,7 @@
         }
 
     </script>
+    <script src="./externalities_chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
