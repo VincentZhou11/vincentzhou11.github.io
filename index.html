@@ -3,12 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+        crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/lux/bootstrap.min.css" crossorigin="anonymous">
+        
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
     <title>📈</title>
 </head>
 
-<body>
+<body ng-app="econ_app">
     <h1 class="display-1 text-center">Interactive Econ Stuff 📈</h1>
     <h1 class="display-3 text-center">By Vincent Zhou</h1>
 
@@ -23,6 +28,7 @@
             <a href="#cost_curve_place" class="list-group-item list-group-item-action">Cost Curve</a>
             <a href="#monopoly_place" class="list-group-item list-group-item-action">Monopoly Cost Curve</a>
             <a href="#externalities_place" class="list-group-item list-group-item-action">Externalities Graph</a>
+            <a href="#money_market_place" class="list-group-item list-group-item-action">Money Market Graph</a>
         </div>
     </div>
 
@@ -55,7 +61,7 @@
     </div>
 
     <hr class="my-4" style="width: 75%">
-    <h1 class="display-4 text-center" id="cost_curve_place">Cost Curve <span class="badge badge-secondary">New</span></h1>
+    <h1 class="display-4 text-center" id="cost_curve_place">Cost Curve</h1>
 
     <div class="graph center">
         <div class="card border-info mb-3 center-element" id ="cc_info_panel" style="width: 18rem; display: none; vertical-align: top;">
@@ -148,7 +154,33 @@
         </div>
     </div>
 
+    <hr class="my-4" style="width: 75%">
+    <h1 class="display-4 text-center" id="money_market_place">Money Market Graph</h1>
+
+    <div ng-controller="money_market">
+        <div class="graph center">
+            <div class="card border-info mb-3 center-element" style="width: 18rem; display: inline-block; vertical-align: top;">
+                <div class="card-header">Info</div>
+                <div class="card-body text-info">
+                    <h5 class="card-title">Long Run Interest Rate</h5>
+                    <p class="card-text">{{r}}%</p>
+                    <h5 class="card-title">Short Run Interest Rate</h5>
+                    <p class="card-text">{{i}}%</p>
+                </div>
+            </div>
+            <canvas class="center-element" id="mm_chart" width="1000" height="600" style="display: inline-block"></canvas>
+        </div>
     
+        <div class="card controls">
+            <h5 class="card-header">Controls</h5>
+            <div class="card-body">
+                <p>Money Supply Increase: {{ms_slider}}</p>
+                <input class="slider" ng-model="ms_slider" type="range" min="0" max="20" value="0">
+                <p>Long Run Interest Rate: {{r}}%</p>
+                <input class="slider" ng-model="r" type="range" min=".05" max=".20" value=".1875" step=".0025">
+            </div>
+        </div>
+    </div>
 
     <style>
         canvas {
@@ -588,7 +620,6 @@
             }
         }
     </script>
-        
     <script>
         var monopoly_tfc_slider = document.getElementById('monopoly_tfc_slider');
         var monopoly_tfc = 100;
@@ -767,6 +798,116 @@
 
     </script>
     <script src="./externalities_chart.js"></script>
+    <script>
+        function addToXY(points, shiftX, shiftY) {
+            var list = [];
+            for (let i = 0; i < points.length; i++) {
+                list.push({ x: points[i].x + shiftX, y: points[i].y + shiftY});
+            }
+            return list;
+        }
+        var mm_ctx = document.getElementById("mm_chart");
+        var mm_chart = new Chart(mm_ctx, {
+            type: 'line',
+            data: {
+                "datasets": [
+                    {
+                        "label": "Money Demand",
+                        "data": generate_xy_line(40, .25, 0, 40),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 255)",
+                        "pointBackgroundColor": "rgb(0, 0, 255)"
+                    },
+                    {
+                        "label": "Money Supply",
+                        "data": [{x: 10, y:0}, {x:10, y:.25}],
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(255, 0, 0)",
+                        "pointBackgroundColor": "rgb(255, 0, 0)"
+                    },
+                    {
+                        "label": "Long Run Money Demand",
+                        "data": generate_xy_line(40, .25, 0, 40),
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(0, 0, 122)",
+                        "pointBackgroundColor": "rgb(0, 0, 122)"
+                    },
+                    {
+                        "label": "New Money Supply",
+                        "data": [{x: 10, y:0}, {x:10, y:.25}],
+                        "fill": false,
+                        "pointRadius": 5,
+                        "borderColor": "rgb(122, 0, 0)",
+                        "pointBackgroundColor": "rgb(122, 0, 0)"
+                    },
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: 40
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Quantity of Money'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                            min: 0,
+                            max: .25,
+                            callback: function (value, index, values) {
+                                return value + "%";
+                            }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Interest Rate'
+                        }
+                    }]
+                }
+            }
+        });
+        var app = angular.module('econ_app', []);
+        app.controller('money_market', function($scope) {
+            $scope.ms_slider = 0;
+            $scope.r = .1875; 
+            $scope.i = .1875;
+            $scope.$watch("ms_slider", function(){
+                mm_chart.data.datasets[2].data = addToXY(generate_xy_line(40, .25, 0, 40), $scope.ms_slider, $scope.r-.1875);
+                mm_chart.data.datasets[3].data = addToXY(mm_chart.data.datasets[1].data, $scope.ms_slider, 0);
+                mm_chart.update();
+                var i = mm_chart.data.datasets[0].data[10+$scope.ms_slider].y;
+                if (i<0) {
+                    i = 0;
+                }
+                $scope.i = i.toFixed(4);
+            });
+            $scope.$watch("r", function(){
+                mm_chart.data.datasets[0].data = addToXY(generate_xy_line(40, .25, 0, 40), 0, $scope.r-.1875);
+                mm_chart.data.datasets[2].data = addToXY(mm_chart.data.datasets[0].data, $scope.ms_slider, 0);
+                mm_chart.update();
+                var i = mm_chart.data.datasets[0].data[10+$scope.ms_slider].y;
+                if (i<0) {
+                    i = 0;
+                }
+                $scope.i = i.toFixed(4);
+            });
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
